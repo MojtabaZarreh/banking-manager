@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking SMS Manager</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Home Page -->
+        <div class="page active" id="home">
+            <div class="header">
+                <h1>مدیریت پیامک بانکی</h1>
+                <p>ثبت و مدیریت تراکنش های بانکی</p>
+            </div>
+            
+            <div class="content">
+                <form method="post" action="{% url 'submit_transaction' %}">
+                {% csrf_token %}
+                    <div class="card">
+                        <div class="input-group">
+                            <label for="smsContent">محتوای پیامک بانکی:</label>
+                            <textarea name="smsContent" id="smsContent" class="input-field" placeholder="متن پیامک بانکی را اینجا وارد کنید..."></textarea>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="description">توضیحات تراکنش:</label>
+                            <input type="text" name="description" id="description" class="input-field" placeholder="مثال: خرید مواد غذایی، اجاره...">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> ثبت تراکنش
+                        </button>
+                    </div>
+                </form>
+    
+                <div class="card">
+                    <div class="input-group">
+                        <label>آپلود عکس رسید:</label>
+                        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+                            <i class="fas fa-camera"></i>
+                            <p>برای عکس گرفتن یا انتخاب فایل کلیک کنید</p>
+                            <input type="file" id="photoInput" class="file-input" accept="image/*" onchange="handlePhotoUpload(event)">
+                        </div>
+                        <img id="previewImage" class="preview-image" style="display: none;">
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="submitPhoto()">
+                        <i class="fas fa-upload"></i> آپلود عکس
+                    </button>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> اطلاعات شما با موفقیت ذخیره شد!
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Page -->
+        <div class="page" id="history">
+            <div class="header">
+                <h1>تاریخچه تراکنش ها</h1>
+                <p>مشاهده تراکنش های قبلی</p>
+            </div>
+            
+            <div class="content">
+                <div id="historyContent">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>در حال بارگذاری...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics Page -->
+        <div class="page" id="analytics">
+            <div class="header">
+                <h1>تحلیل هوشمند</h1>
+                <p>بررسی الگوی مصرف شما</p>
+            </div>
+            
+            <div class="content">
+                <div id="analyticsContent">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>در حال تحلیل...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="navigation">
+            <div class="nav-item active" onclick="showPage('home')">
+                <i class="fas fa-home"></i>
+                <span>خانه</span>
+            </div>
+            <div class="nav-item" onclick="showPage('history')">
+                <i class="fas fa-history"></i>
+                <span>تاریخچه</span>
+            </div>
+            <div class="nav-item" onclick="showPage('analytics')">
+                <i class="fas fa-chart-line"></i>
+                <span>تحلیل</span>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'script.js' %}"></script>
+</body>
+</html> 
