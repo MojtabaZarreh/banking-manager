@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('master.urls'), name='master'),
     path('', include('transactions.urls'), name='transactions'),
+    path('', include('parsedtransaction.urls'), name='parsedtransaction'),
     # path('', include('dashboard.urls')),
     # path('', include('post.urls')),
     # path('tinymce/', include('tinymce.urls')),

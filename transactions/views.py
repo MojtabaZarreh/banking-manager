@@ -28,7 +28,7 @@ def submit(request):
                 model="gpt-4o",
             )
              
-            raw_result = agent.parse(user_text)
+            raw_result = agent.parse(user_text, description)
             clean_result = re.sub(r"^```json|```$", "", raw_result.strip()).strip()
             result = json.loads(clean_result)
             ParsedTransaction.objects.create(
@@ -58,5 +58,6 @@ def transaction_list_api(request):
                 'description': tr.description,
                 'date': tr.date_time,
                 'type': tr_type
+                
             })
         return JsonResponse(data, safe=False)

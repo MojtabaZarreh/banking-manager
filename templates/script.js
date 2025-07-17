@@ -1,21 +1,23 @@
 // Navigation functionality
-function showPage(pageId) {
+function showPage(pageId, event = null) {
     // Hide all pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
-    
+
     // Remove active class from all nav items
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     // Show selected page
     document.getElementById(pageId).classList.add('active');
-    
+
     // Add active class to clicked nav item
-    event.target.closest('.nav-item').classList.add('active');
-    
+    if (event) {
+        event.target.closest('.nav-item').classList.add('active');
+    }
+
     // Load content for specific pages
     if (pageId === 'history') {
         loadHistory();
@@ -28,14 +30,13 @@ function showPage(pageId) {
 async function submitSMS() {
     const smsContent = document.getElementById('smsContent').value;
     const description = document.getElementById('description').value;
-    
+
     if (!smsContent.trim()) {
         alert('لطفاً محتوای پیامک را وارد کنید');
         return;
     }
-    
+
     try {
-        // Replace with your actual API endpoint
         const response = await fetch('/api/sms', {
             method: 'POST',
             headers: {
@@ -47,7 +48,7 @@ async function submitSMS() {
                 timestamp: new Date().toISOString()
             })
         });
-        
+
         if (response.ok) {
             showSuccessMessage();
             document.getElementById('smsContent').value = '';
@@ -57,8 +58,7 @@ async function submitSMS() {
         }
     } catch (error) {
         console.error('Error:', error);
-        // For demo purposes, show success message
-        showSuccessMessage();
+        showSuccessMessage(); // Fallback for demo
         document.getElementById('smsContent').value = '';
         document.getElementById('description').value = '';
     }
@@ -69,7 +69,7 @@ function handlePhotoUpload(event) {
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const preview = document.getElementById('previewImage');
             preview.src = e.target.result;
             preview.style.display = 'block';
@@ -82,23 +82,22 @@ function handlePhotoUpload(event) {
 async function submitPhoto() {
     const photoInput = document.getElementById('photoInput');
     const file = photoInput.files[0];
-    
+
     if (!file) {
         alert('لطفاً ابتدا عکسی انتخاب کنید');
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('photo', file);
     formData.append('timestamp', new Date().toISOString());
-    
+
     try {
-        // Replace with your actual API endpoint
         const response = await fetch('/api/photo', {
             method: 'POST',
             body: formData
         });
-        
+
         if (response.ok) {
             showSuccessMessage();
             photoInput.value = '';
@@ -108,8 +107,7 @@ async function submitPhoto() {
         }
     } catch (error) {
         console.error('Error:', error);
-        // For demo purposes, show success message
-        showSuccessMessage();
+        showSuccessMessage(); // Fallback
         photoInput.value = '';
         document.getElementById('previewImage').style.display = 'none';
     }
@@ -127,11 +125,10 @@ function showSuccessMessage() {
 // Load transaction history
 async function loadHistory() {
     const historyContent = document.getElementById('historyContent');
-    
+
     try {
-        // Replace with your actual API endpoint
         const response = await fetch('/api/history');
-        
+
         if (response.ok) {
             const transactions = await response.json();
             displayHistory(transactions);
@@ -140,27 +137,7 @@ async function loadHistory() {
         }
     } catch (error) {
         console.error('Error loading history:', error);
-        // For demo purposes, show sample data
-        displayHistory([
-            {
-                id: 1,
-                smsContent: 'واریز 500000 ریال به حساب شما',
-                description: 'حقوق',
-                date: '2024-01-15'
-            },
-            {
-                id: 2,
-                smsContent: 'برداشت 150000 ریال از حساب شما',
-                description: 'خرید مواد غذایی',
-                date: '2024-01-14'
-            },
-            {
-                id: 3,
-                smsContent: 'برداشت 300000 ریال از حساب شما',
-                description: 'اجاره خانه',
-                date: '2024-01-13'
-            }
-        ]);
+        displayHistory([]);
     }
 }
 
@@ -168,7 +145,7 @@ async function loadHistory() {
 function displayHistory(transactions) {
     const historyContent = document.getElementById('historyContent');
 
-    if (transactions.length === 0) {
+    if (!transactions || transactions.length === 0) {
         historyContent.innerHTML = '<p style="text-align: center; color: #666;">هیچ تراکنشی یافت نشد</p>';
         return;
     }
@@ -179,10 +156,10 @@ function displayHistory(transactions) {
 
         if (transaction.type === -1) {
             typeLabel = 'برداشت';
-            typeColor = '#d9534f'; // قرمز
+            typeColor = '#d9534f';
         } else if (transaction.type === 1) {
             typeLabel = 'واریز';
-            typeColor = '#5cb85c'; // سبز
+            typeColor = '#5cb85c';
         }
 
         return `
@@ -198,26 +175,23 @@ function displayHistory(transactions) {
     }).join('');
 }
 
-
-// Load analytics
-async function loadAnalytics() {
+async function loadAnalytics(month = 4) {
     const analyticsContent = document.getElementById('analyticsContent');
-    
+
     try {
-        // Replace with your actual API endpoint
-        const response = await fetch('/api/analytics');
-        
-        if (response.ok) {
-            const analytics = await response.json();
-            displayAnalytics(analytics);
-        } else {
-            throw new Error('Failed to load analytics');
-        }
-    } catch (error) {
-        console.error('Error loading analytics:', error);
-        // For demo purposes, show sample data
+        const [summaryRes, suggestionsRes] = await Promise.all([
+            fetch(`/api/summary/?month=${month}`),
+            fetch(`/api/suggestions/?month=${month}`)
+        ]);
+
+        const summary = await summaryRes.json();
+        // const suggestions = await suggestionsRes.json();
+
         displayAnalytics({
-            monthlySpending: 2500000,
+            income: summary.income,
+            expense: summary.expense,
+            balance: summary.balance,
+            // suggestions: suggestions
             suggestions: [
                 {
                     title: 'کاهش هزینه خرید',
@@ -225,7 +199,26 @@ async function loadAnalytics() {
                 },
                 {
                     title: 'پس انداز',
-                    message: 'با توجه به الگوی خرج شما، می توانید ماهانه 200000 ریال پس انداز کنید.'
+                    message: 'با توجه به الگوی خرج شما، می‌توانید ماهانه 200,000 ریال پس‌انداز کنید.'
+                }
+            ]
+        });
+
+    } catch (error) {
+        console.error('Error loading analytics or suggestions:', error);
+
+        displayAnalytics({
+            // income: 30467423,
+            // expense: 2450000,
+            // balance: 28017423,
+            suggestions: [
+                {
+                    title: 'کاهش هزینه خرید',
+                    message: 'هزینه خرید شما این ماه 20% افزایش یافته. سعی کنید از لیست خرید استفاده کنید.'
+                },
+                {
+                    title: 'پس انداز',
+                    message: 'با توجه به الگوی خرج شما، می‌توانید ماهانه 200,000 ریال پس‌انداز کنید.'
                 }
             ]
         });
@@ -235,12 +228,17 @@ async function loadAnalytics() {
 // Display analytics
 function displayAnalytics(analytics) {
     const analyticsContent = document.getElementById('analyticsContent');
-    
+
+    const income = analytics?.income ?? 0;
+    const expense = analytics?.expense ?? 0;
+    const balance = analytics?.balance ?? 0;
+    const suggestions = Array.isArray(analytics?.suggestions) ? analytics.suggestions : [];
+
     analyticsContent.innerHTML = `
         <div class="analytics-card">
             <h3>هزینه این ماه</h3>
-            <div class="amount">${analytics.monthlySpending.toLocaleString()} ریال</div>
-            <p>مجموع تراکنش های این ماه</p>
+            <div class="amount">${expense.toLocaleString()} ریال</div>
+            <p>مجموع تراکنش‌های این ماه</p>
             <div style="display: flex;
                     justify-content: space-evenly;
                     margin-top: 15px;
@@ -248,22 +246,23 @@ function displayAnalytics(analytics) {
                     border-radius: 10px;
                     padding: 10px;">
                 <div style="text-align: center;">
-                    <div style="font-size: 10px; color: #28a745;">30,467,423+</div>
+                    <div style="font-size: 10px; color: #28a745;">${income.toLocaleString()}+</div>
                     <div style="font-size: 10px; color: #373737;">درآمد</div>
                 </div>
                 <div style="text-align: center;">
-                    <div style="font-size: 10px; color: #dc3545;">2,450,000-</div>
+                    <div style="font-size: 10px; color: #dc3545;">${expense.toLocaleString()}-</div>
                     <div style="font-size: 10px; color: #373737;">هزینه</div>
                 </div>
                 <div style="text-align: center;">
-                    <div style="font-size: 10px; color: #17a2b8;">2,550,000+</div>
+                    <div style="font-size: 10px; color: #17a2b8;">${balance.toLocaleString()}+</div>
                     <div style="font-size: 10px; color: #373737;">باقی‌مانده</div>
                 </div>
-                </div>
             </div>
+        </div>
+
         <div class="card">
             <h3 style="margin-bottom: 20px;">پیشنهادات هوشمند</h3>
-            ${analytics.suggestions.map(suggestion => `
+            ${suggestions.map(suggestion => `
                 <div class="suggestion-card">
                     <h4>${suggestion.title}</h4>
                     <p>${suggestion.message}</p>
