@@ -179,22 +179,35 @@ async function loadAnalytics(month = 4) {
     const analyticsContent = document.getElementById('analyticsContent');
 
     try {
-        const [summaryRes, suggestionsRes] = await Promise.all([
-            fetch(`/api/summary/?month=${month}`),
-            fetch(`/api/suggestions/?month=${month}`)
-        ]);
-
+        const summaryRes = await fetch(`/api/summary/?month=${month}`);
         const summary = await summaryRes.json();
+
+        displayAnalytics({
+            income: summary.income,
+            expense: summary.expense,
+            balance: summary.balance,
+            suggestions: []
+        });
+
+        const result = await Swal.fire({
+            title: '💡 پیشنهاد هوشمند برای شما',
+            text: 'مایل هستید بر اساس الگوی خرج‌هاتون، چند پیشنهاد کاربردی برای صرفه‌جویی ببینید؟',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'بله، نمایش بده',
+            cancelButtonText: 'خیر'
+        });
+        if (!result.isConfirmed) return;
+        const suggestionsRes = await fetch(`/api/analytics/?month=${month}&user=${summary.income}&type=${summary.expense}`)
         // const suggestions = await suggestionsRes.json();
 
         displayAnalytics({
             income: summary.income,
             expense: summary.expense,
             balance: summary.balance,
-            // suggestions: suggestions
             suggestions: [
                 {
-                    title: 'کاهش هزینه خرید',
+                    title: 'بلااااااد',
                     message: 'هزینه خرید شما این ماه 20% افزایش یافته. سعی کنید از لیست خرید استفاده کنید.'
                 },
                 {
@@ -208,9 +221,9 @@ async function loadAnalytics(month = 4) {
         console.error('Error loading analytics or suggestions:', error);
 
         displayAnalytics({
-            // income: 30467423,
-            // expense: 2450000,
-            // balance: 28017423,
+            income: summary.income,
+            expense: summary.expense,
+            balance: summary.balance,
             suggestions: [
                 {
                     title: 'کاهش هزینه خرید',
@@ -260,7 +273,7 @@ function displayAnalytics(analytics) {
             </div>
         </div>
 
-        <div class="card">
+        <div class="card">     
             <h3 style="margin-bottom: 20px;">پیشنهادات هوشمند</h3>
             ${suggestions.map(suggestion => `
                 <div class="suggestion-card">
