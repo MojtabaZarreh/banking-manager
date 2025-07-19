@@ -7,7 +7,7 @@ class TransactionParser(BaseAgent):
     def __init__(self, agent_name, model="gpt-4o", endpoint="https://api.gapgpt.app/v1", api_key='sk-NoXiKQ9JB8qPlauOmNdNqUiS7tLC4Yp6qWLgkp9BGuL0f2Z7'):
         super().__init__(agent_name, model, endpoint, api_key)
         self.client = OpenAI(base_url=self.endpoint, api_key=self.api_key)
-
+        
     def parse(self, text: str, description: str) -> str:
         prompt = f"""
                     شما یک سیستم استخراج اطلاعات از پیامک‌های بانکی هستید. لطفاً پیامک زیر را بررسی کن و اطلاعات اصلی آن را به‌صورت دقیق در قالب JSON استخراج کن.
@@ -52,3 +52,6 @@ class TransactionParser(BaseAgent):
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
+    
+    def analyst(self, income, expense, balance) -> str:
+        return f"Analyzed: {income=}, {expense=}, {balance=}"

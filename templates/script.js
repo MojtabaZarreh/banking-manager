@@ -186,36 +186,44 @@ async function loadAnalytics(month = 4) {
             income: summary.income,
             expense: summary.expense,
             balance: summary.balance,
-            suggestions: []
+            suggestions: [
+                {
+                    title: 'تحلیل مالی ماه جاری ',
+                    message: 'گزارشی برای نمایش وجود ندارد.'
+                }
+            ]
         });
 
         const result = await Swal.fire({
-            title: '💡 پیشنهاد هوشمند برای شما',
-            text: 'مایل هستید بر اساس الگوی خرج‌هاتون، چند پیشنهاد کاربردی برای صرفه‌جویی ببینید؟',
+            title: 'پیشنهاد هوشمند💡',
+            text: 'مایل هستید بر اساس الگوی تراکنش ها، وضعیت ماه جاری تحلیل و بررسی بشه ؟',
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'بله، نمایش بده',
             cancelButtonText: 'خیر'
         });
-        if (!result.isConfirmed) return;
-        const suggestionsRes = await fetch(`/api/analytics/?month=${month}&user=${summary.income}&type=${summary.expense}`)
-        // const suggestions = await suggestionsRes.json();
 
-        displayAnalytics({
-            income: summary.income,
-            expense: summary.expense,
-            balance: summary.balance,
-            suggestions: [
-                {
-                    title: 'بلااااااد',
-                    message: 'هزینه خرید شما این ماه 20% افزایش یافته. سعی کنید از لیست خرید استفاده کنید.'
-                },
-                {
-                    title: 'پس انداز',
-                    message: 'با توجه به الگوی خرج شما، می‌توانید ماهانه 200,000 ریال پس‌انداز کنید.'
-                }
-            ]
+        if (!result.isConfirmed) return;
+
+        Swal.fire({
+            title: 'در حال بررسی و پردازش تراکنش ها ...',
+            text: 'لطفاً منتظر بمانید',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
+        
+        const suggestionsRes = await fetch(`/api/analytics/?income=${summary.income}&expense=${summary.expense}&balance=${summary.balance}`);
+        const suggestionsData = await suggestionsRes.json();
+        // console.log(suggestionsData)
+        Swal.close();
+        displayAnalytics({
+                income: summary.income,
+                expense: summary.expense,
+                balance: summary.balance,
+                suggestions: suggestionsData.suggestions ?? []
+            });
 
     } catch (error) {
         console.error('Error loading analytics or suggestions:', error);
@@ -238,7 +246,6 @@ async function loadAnalytics(month = 4) {
     }
 }
 
-// Display analytics
 function displayAnalytics(analytics) {
     const analyticsContent = document.getElementById('analyticsContent');
 
@@ -267,20 +274,52 @@ function displayAnalytics(analytics) {
                     <div style="font-size: 10px; color: #373737;">هزینه</div>
                 </div>
                 <div style="text-align: center;">
-                    <div style="font-size: 10px; color: #17a2b8;">${balance.toLocaleString()}+</div>
+                    <div style="font-size: 10px; color: #17a2b8;">${balance.toLocaleString()}</div>
                     <div style="font-size: 10px; color: #373737;">باقی‌مانده</div>
                 </div>
             </div>
         </div>
 
-        <div class="card">     
+        <div class="card" id="suggestionsArea">     
             <h3 style="margin-bottom: 20px;">پیشنهادات هوشمند</h3>
-            ${suggestions.map(suggestion => `
-                <div class="suggestion-card">
-                    <h4>${suggestion.title}</h4>
-                    <p>${suggestion.message}</p>
-                </div>
-            `).join('')}
         </div>
     `;
+
+    const container = document.getElementById('suggestionsArea');
+
+    let index = 0;
+    function typeNextSuggestion() {
+        if (index >= suggestions.length) return;
+
+        const suggestion = suggestions[index];
+        const card = document.createElement('div');
+        card.className = 'suggestion-card';
+        const title = document.createElement('h4');
+        const message = document.createElement('p');
+
+        title.textContent = suggestion.title;
+        message.textContent = ''; 
+
+        card.appendChild(title);
+        card.appendChild(message);
+        container.appendChild(card);
+
+        typewriterEffect(message, suggestion.message, 0, () => {
+            index++;
+            setTimeout(typeNextSuggestion, 500);
+        });
+    }
+
+    typeNextSuggestion(); 
+}
+
+function typewriterEffect(element, text, i = 0, callback) {
+    if (i < text.length) {
+        element.innerHTML += text.charAt(i);
+        setTimeout(() => {
+            typewriterEffect(element, text, i + 1, callback);
+        }, 30);
+    } else if (callback) {
+        callback();
+    }
 }
