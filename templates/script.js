@@ -89,11 +89,11 @@ async function submitPhoto() {
     }
 
     const formData = new FormData();
-    formData.append('photo', file);
+    formData.append('image', file);
     formData.append('timestamp', new Date().toISOString());
 
     try {
-        const response = await fetch('/api/photo', {
+        const response = await fetch('/api/photo/', {
             method: 'POST',
             body: formData
         });
@@ -105,9 +105,10 @@ async function submitPhoto() {
         } else {
             alert('خطا در آپلود عکس');
         }
+    console.log(response)
     } catch (error) {
         console.error('Error:', error);
-        showSuccessMessage(); // Fallback
+        showSuccessMessage(); 
         photoInput.value = '';
         document.getElementById('previewImage').style.display = 'none';
     }

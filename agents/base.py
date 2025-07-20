@@ -13,4 +13,8 @@ class BaseAgent(ABC):
 
     @abstractmethod
     def analyst(self, income, expense, balance) -> str:
-        pass
+        raise NotImplementedError(f"{self.__class__.__name__} has not implemented ocr()")
+
+    @abstractmethod
+    def ocr(self, image_path: str) -> str:
+        raise NotImplementedError(f"{self.__class__.__name__} has not implemented ocr()")

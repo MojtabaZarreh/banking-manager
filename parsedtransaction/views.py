@@ -7,6 +7,8 @@ from agents.registry import get_agent
 from agents import analyst_agent
 from django.http import JsonResponse
 from django.core.cache import cache
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.views.decorators.csrf import csrf_exempt
 import hashlib
 import json
 import re
@@ -59,3 +61,33 @@ def monthly_suggestions_view(request):
         return JsonResponse({'error': f'خطا در پردازش تحلیل: {str(e)}'}, status=500)
 
     return JsonResponse({'suggestions': suggestions})
+
+@csrf_exempt
+def ocr_transaction_view(request):
+    image = request.FILES.get('image')
+
+    if not image or not isinstance(image, InMemoryUploadedFile):
+        return JsonResponse({'error': 'تصویر معتبر ارسال نشده است'}, status=400)
+
+    try:
+        agent = get_agent("ocr", agent_name="LLMOCRAgent")
+
+        result = agent.ocr(image)
+
+        if not result:
+            return JsonResponse({'error': 'تحلیل تصویر ناموفق بود'}, status=500)
+
+        print(result)
+        transaction = ParsedTransaction.objects.create(
+            type=result.get('type'),
+            amount=result.get('amount'),
+            account=result.get('account'),
+            balance=result.get('balance'),
+            date_time=result.get('date_time')
+        )
+        
+        return JsonResponse({'transaction_id': transaction.id})
+
+    except Exception as e:
+        print(result)
+        return JsonResponse({'error': f'خطا در ثبت تراکنش: {str(e)}'}, status=500)
