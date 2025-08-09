@@ -21,20 +21,22 @@ def monthly_summary_view(request):
             return JsonResponse({'error': 'ماه نامعتبر است'}, status=400)
 
     month_str = f"{int(month):02d}"
-    filtered = ParsedTransaction.objects.filter(date_time__regex=rf'^1404/{month_str}/')
+    filtered = ParsedTransaction.objects.filter(date_time__regex=rf'^1404/{month_str}/').filter(transaction__user = request.user)
  
     income = filtered.filter(type=1).aggregate(total=Sum('amount'))['total'] or 0
     expense = filtered.filter(type=-1).aggregate(total=Sum('amount'))['total'] or 0
     balance = income - expense
     
     return JsonResponse({
-        'month': int(month),
+        'month': month_str,
         'income': income,
         'expense': expense,
         'balance': balance
     })
+  
     
 def monthly_suggestions_view(request):
+    month = request.GET.get('month')
     income = request.GET.get('income')
     expense = request.GET.get('expense')
     balance = request.GET.get('balance')
@@ -42,7 +44,7 @@ def monthly_suggestions_view(request):
     if not all([income, expense, balance]):
         return JsonResponse({'error': 'اطلاعات ناقص است'}, status=400)
 
-    key_string = f"{income}-{expense}-{balance}"
+    key_string = f"{income}-{expense}-{balance}-{request.user.id}"
     cache_key = "monthly_suggestions_" + hashlib.md5(key_string.encode()).hexdigest()
 
     cached_data = cache.get(cache_key)
@@ -50,8 +52,8 @@ def monthly_suggestions_view(request):
         return JsonResponse({'suggestions': cached_data})
 
     try:
-        agent = get_agent("analyst", agent_name="LLMAnalystAgent", model="gpt-4o")
-        suggestions = agent.analyst(int(income), int(expense), int(balance))
+        agent = get_agent("analyst", agent_name="LLMAnalystAgent")
+        suggestions = agent.analyst(request, int(income), int(expense), int(balance), month)
 
         suggestions = re.sub(r"^```json|```$", "", suggestions.strip()).strip()
         suggestions = json.loads(suggestions)
@@ -61,6 +63,7 @@ def monthly_suggestions_view(request):
         return JsonResponse({'error': f'خطا در پردازش تحلیل: {str(e)}'}, status=500)
 
     return JsonResponse({'suggestions': suggestions})
+
 
 @csrf_exempt
 def ocr_transaction_view(request):

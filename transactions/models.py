@@ -1,9 +1,9 @@
 from django.db import models
 from persiantools.jdatetime import JalaliDateTime
+from django.contrib.auth.models import User
 
-# Create your models here.
 class transactions(models.Model):
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
     transaction = models.TextField()
     description = models.TextField()
     image = models.ImageField(upload_to='transaction/', null=True, blank=True)

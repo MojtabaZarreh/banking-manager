@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from master.urls import master
 from .models import transactions
 from parsedtransaction.models import ParsedTransaction
 from django.contrib import messages
@@ -19,13 +20,12 @@ def submit(request):
             messages.error(request, "متن پیامک را وارد کنید.")
             return redirect(request.path)
         
-        tr = transactions.objects.create(transaction=user_text, description=description)
+        tr = transactions.objects.create(user=request.user, transaction=user_text, description=description)
         
         try:
             agent = get_agent(
                 "parser",
                 agent_name="LLMParsedTransaction",
-                model="gpt-4o",
             )
              
             raw_result = agent.parse(user_text, description)
@@ -43,12 +43,12 @@ def submit(request):
         except Exception as e:
             messages.error(request, f"خطا در پردازش تراکنش: {str(e)}")
         
-    return render(request, 'index.html')
-
+    return redirect('master')
+      
 def transaction_list_api(request):
     if request.method == 'GET':
         data = []
-        for tr in transactions.objects.all().order_by('-created_at'):
+        for tr in transactions.objects.filter(user=request.user).order_by('-created_at'):
             parsed = tr.parsed.first()  
             tr_type = parsed.type if parsed else None 
 

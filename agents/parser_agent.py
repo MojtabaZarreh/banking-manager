@@ -1,12 +1,14 @@
 from openai import OpenAI
 from .base import BaseAgent
 from .registry import register_agent
+from groq import Groq
 
 @register_agent("parser")
 class TransactionParser(BaseAgent):
-    def __init__(self, agent_name, model="gpt-4o", endpoint="https://api.gapgpt.app/v1", api_key='sk-NoXiKQ9JB8qPlauOmNdNqUiS7tLC4Yp6qWLgkp9BGuL0f2Z7'):
+    def __init__(self, agent_name, model="openai/gpt-oss-20b", endpoint="https://api.groq.com/openai/v1/chat/completions", 
+                 api_key='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'):
         super().__init__(agent_name, model, endpoint, api_key)
-        self.client = OpenAI(base_url=self.endpoint, api_key=self.api_key)
+        self.client = Groq(api_key=self.api_key)
         
     def parse(self, text: str, description: str) -> str:
         prompt = f"""
@@ -53,5 +55,5 @@ class TransactionParser(BaseAgent):
         )
         return response.choices[0].message.content
     
-    def analyst(self, income, expense, balance) -> str:
-        return f"Analyzed: {income=}, {expense=}, {balance=}"
+    def analyst(self) -> str:
+        return "Analyst not implemented in this agent."

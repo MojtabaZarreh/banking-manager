@@ -176,7 +176,7 @@ function displayHistory(transactions) {
     }).join('');
 }
 
-async function loadAnalytics(month = 4) {
+async function loadAnalytics(month = 5) {
     const analyticsContent = document.getElementById('analyticsContent');
 
     try {
@@ -215,7 +215,7 @@ async function loadAnalytics(month = 4) {
             }
         });
         
-        const suggestionsRes = await fetch(`/api/analytics/?income=${summary.income}&expense=${summary.expense}&balance=${summary.balance}`);
+        const suggestionsRes = await fetch(`/api/analytics/?income=${summary.income}&expense=${summary.expense}&balance=${summary.balance}&month=${summary.month}`);
         const suggestionsData = await suggestionsRes.json();
         // console.log(suggestionsData)
         Swal.close();

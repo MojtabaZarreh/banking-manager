@@ -25,4 +25,4 @@ class ParsedTransaction(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.transaction} | {self.amount} | {self.date_time}"
+        return f"{self.transaction} | {self.amount} | {self.date_time} | {self.transaction.user}"
