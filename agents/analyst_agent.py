@@ -3,12 +3,12 @@ from .base import BaseAgent
 from .registry import register_agent
 from transactions.models import transactions
 from groq import Groq
+from core.config import settings
 
 @register_agent("analyst")
 class Analyzer(BaseAgent):
-    def __init__(self, agent_name, model="openai/gpt-oss-20b", endpoint="https://api.groq.com/openai/v1/chat/completions",
-                 api_key='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'):
-        super().__init__(agent_name, model, endpoint, api_key)
+    def __init__(self, agent_name, model="openai/gpt-oss-20b", api_key=settings.Agent2['API_KEY']):
+        super().__init__(agent_name, model, api_key)
         #OpenAI
         self.client = Groq(#base_url=self.endpoint, 
                            api_key=self.api_key)

@@ -5,7 +5,7 @@
 
 # @register_agent("ocr")
 # class OCRAgent(BaseAgent):
-#     def __init__(self, agent_name, model="gemini-2.5-flash", endpoint="https://api.gapgpt.app/", api_key='sk-NoXiKQ9JB8qPlauOmNdNqUiS7tLC4Yp6qWLgkp9BGuL0f2Z7'):
+#     def __init__(self, agent_name, model="gemini-2.5-flash", endpoint="", api_key=''):
 #         super().__init__(agent_name, model, endpoint, api_key)
 #         self.client = Client(http_options=HttpOptions(base_url=endpoint), api_key=self.api_key)
         
