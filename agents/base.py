@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
 class BaseAgent(ABC):
-    def __init__(self, agent_name, model, api_key):
+    def __init__(self, agent_name, model, api_key, endpoint=''):
         self.agent_name = agent_name
         self.model = model
-        # self.endpoint = endpoint
         self.api_key = api_key
+        self.endpoint = endpoint
 
     @abstractmethod
     def parse(self, text: str) -> str:
