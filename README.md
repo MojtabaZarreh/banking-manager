@@ -41,7 +41,7 @@ Open http://127.0.0.1:8000 in your browser and log in with the superuser credent
 
 You can now access the admin panel and start using the application.
 
-#📅 Future Plans
+# 📅 Future Plans
 
 OCR Integration: Automatically extract transaction details from scanned bank receipts.
 
