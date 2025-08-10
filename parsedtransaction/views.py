@@ -8,12 +8,13 @@ from agents import analyst_agent
 from django.http import JsonResponse
 from django.core.cache import cache
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import hashlib
 import json
 import re
 
-
+@login_required
 def monthly_summary_view(request):
     month = request.GET.get('month')
     
@@ -34,7 +35,7 @@ def monthly_summary_view(request):
         'balance': balance
     })
   
-    
+@login_required    
 def monthly_suggestions_view(request):
     month = request.GET.get('month')
     income = request.GET.get('income')

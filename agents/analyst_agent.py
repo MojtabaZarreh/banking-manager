@@ -7,7 +7,7 @@ from core.config import settings
 
 @register_agent("analyst")
 class Analyzer(BaseAgent):
-    def __init__(self, agent_name, model="openai/gpt-oss-20b", api_key=settings.Agent2['API_KEY']):
+    def __init__(self, agent_name, model="openai/gpt-oss-120b", api_key=settings.Agent2['API_KEY']):
         super().__init__(agent_name, model, api_key)
         #OpenAI
         self.client = Groq(#base_url=self.endpoint, 

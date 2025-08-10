@@ -15,13 +15,7 @@ def submit(request):
     if request.method == 'POST':
         user_text = request.POST.get('smsContent')
         description = request.POST.get('description')
-        
-        if not user_text:
-            messages.error(request, "متن پیامک را وارد کنید.")
-            return redirect(request.path)
-        
-        tr = transactions.objects.create(user=request.user, transaction=user_text, description=description)
-        
+        tr = transactions.objects.create(user=request.user, transaction=user_text, description=description) 
         try:
             agent = get_agent(
                 "parser",
@@ -39,11 +33,10 @@ def submit(request):
                 type=result.get('type')
             )
             messages.success(request, f"تراکنش با موفقیت ثبت و تحلیل شد.")
-                
         except Exception as e:
             messages.error(request, f"خطا در پردازش تراکنش: {str(e)}")
-        
-    return redirect('master')
+            
+        return redirect('/')
       
 def transaction_list_api(request):
     if request.method == 'GET':
