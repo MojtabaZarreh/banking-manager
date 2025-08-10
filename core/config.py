@@ -6,12 +6,12 @@ class Settings:
     
     Agent1 = {
         "ENDPOINT": "https://api.groq.com/openai/v1/chat/completions",
-        "API_KEY": "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"
+        "API_KEY": "#YOUR_API_KEY"
     }
     
     Agent2 = {
         "ENDPOINT": "https://api.groq.com/openai/v1/chat/completions",
-        "API_KEY": "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"
+        "API_KEY": "#YOUR_API_KEY"
     }
     
     @abstractmethod

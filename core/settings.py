@@ -8,7 +8,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 SECRET_KEY = 'django-insecure-25t@j)^l9(xaw_+1x&3+zo2xc7o=@4fy$f7ynm6f)##$2yfubp'
 DEBUG = True
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','127.0.0.1:8000']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
