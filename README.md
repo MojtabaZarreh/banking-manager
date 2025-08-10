@@ -17,3 +17,28 @@ This separation of concerns enables Banking Manager to be both scalable and effi
 
 https://github.com/user-attachments/assets/4f647ae2-bd7f-4095-ac5f-867d9694b54f
 
+🚀 Getting Started
+Clone the repository and install dependencies:
+```
+git clone https://github.com/MojtabaZarreh/banking-manager.git
+cd banking-manager
+```
+Run database migrations:
+```
+python manage.py migrate
+```
+Create a superuser account:
+```
+python manage.py createsuperuser
+```
+Follow the prompts to set up your username, email, and password.
+
+Start the development server:
+```
+python manage.py runserver
+```
+Open http://127.0.0.1:8000 in your browser and log in with the superuser credentials you created.
+
+You can now access the admin panel and start using the application.
+
+
